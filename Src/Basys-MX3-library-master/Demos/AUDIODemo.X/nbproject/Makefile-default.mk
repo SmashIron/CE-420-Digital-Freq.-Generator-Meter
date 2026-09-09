@@ -30,12 +30,12 @@ ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 IMAGE_TYPE=debug
 OUTPUT_SUFFIX=elf
 DEBUGGABLE_SUFFIX=elf
-FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+FINAL_IMAGE=${DISTDIR}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 else
 IMAGE_TYPE=production
 OUTPUT_SUFFIX=hex
 DEBUGGABLE_SUFFIX=elf
-FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+FINAL_IMAGE=${DISTDIR}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 endif
 
 ifeq ($(COMPARE_BUILD), true)
@@ -64,6 +64,7 @@ OBJECTFILES=${OBJECTDIR}/audio.o ${OBJECTDIR}/main.o ${OBJECTDIR}/mic.o ${OBJECT
 SOURCEFILES=audio.c main.c mic.c adc.c led.c swt.c lcd.c utils.c
 
 
+
 CFLAGS=
 ASFLAGS=
 LDLIBSOPTIONS=
@@ -81,7 +82,7 @@ FIXDEPS=fixDeps
 ifneq ($(INFORMATION_MESSAGE), )
 	@echo $(INFORMATION_MESSAGE)
 endif
-	${MAKE}  -f nbproject/Makefile-default.mk dist/${CND_CONF}/${IMAGE_TYPE}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+	${MAKE}  -f nbproject/Makefile-default.mk ${DISTDIR}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
 MP_PROCESSOR_OPTION=32MX370F512L
 MP_LINKER_FILE_OPTION=
@@ -100,102 +101,102 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/audio.o: audio.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/audio.o: audio.c  .generated_files/flags/default/e387c0e0070db36692e5130a0e361684061df924 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/audio.o.d 
 	@${RM} ${OBJECTDIR}/audio.o 
-	@${FIXDEPS} "${OBJECTDIR}/audio.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/audio.o.d" -o ${OBJECTDIR}/audio.o audio.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/audio.o.d" -o ${OBJECTDIR}/audio.o audio.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/8d3fedf7214cd0ecc05b2f908251a6c9c2ba049d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
 	@${RM} ${OBJECTDIR}/main.o 
-	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/mic.o: mic.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/mic.o: mic.c  .generated_files/flags/default/579e6fd8754f24971c2c934605db142ea32a1fca .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/mic.o.d 
 	@${RM} ${OBJECTDIR}/mic.o 
-	@${FIXDEPS} "${OBJECTDIR}/mic.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/mic.o.d" -o ${OBJECTDIR}/mic.o mic.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/mic.o.d" -o ${OBJECTDIR}/mic.o mic.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/adc.o: adc.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/adc.o: adc.c  .generated_files/flags/default/7bb62a077b0f4d8b0f93f161d97e0235d3e8d761 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/adc.o.d 
 	@${RM} ${OBJECTDIR}/adc.o 
-	@${FIXDEPS} "${OBJECTDIR}/adc.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/adc.o.d" -o ${OBJECTDIR}/adc.o adc.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/adc.o.d" -o ${OBJECTDIR}/adc.o adc.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/led.o: led.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/led.o: led.c  .generated_files/flags/default/f3284713e4e40807dbc88486f2779d426730266e .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/led.o.d 
 	@${RM} ${OBJECTDIR}/led.o 
-	@${FIXDEPS} "${OBJECTDIR}/led.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/led.o.d" -o ${OBJECTDIR}/led.o led.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/led.o.d" -o ${OBJECTDIR}/led.o led.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/swt.o: swt.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/swt.o: swt.c  .generated_files/flags/default/41cb6a549bd700dd2e18f5a17434a1ec3d2eb9f2 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/swt.o.d 
 	@${RM} ${OBJECTDIR}/swt.o 
-	@${FIXDEPS} "${OBJECTDIR}/swt.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/swt.o.d" -o ${OBJECTDIR}/swt.o swt.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/swt.o.d" -o ${OBJECTDIR}/swt.o swt.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/lcd.o: lcd.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/lcd.o: lcd.c  .generated_files/flags/default/a61ac0e940d2f3b618b5120fe0b723e868e0b44 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/lcd.o.d 
 	@${RM} ${OBJECTDIR}/lcd.o 
-	@${FIXDEPS} "${OBJECTDIR}/lcd.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/lcd.o.d" -o ${OBJECTDIR}/lcd.o lcd.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/lcd.o.d" -o ${OBJECTDIR}/lcd.o lcd.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/utils.o: utils.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/utils.o: utils.c  .generated_files/flags/default/e5d963dd68db3fce4ae8cd765ed9710b0eae6169 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/utils.o.d 
 	@${RM} ${OBJECTDIR}/utils.o 
-	@${FIXDEPS} "${OBJECTDIR}/utils.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/utils.o.d" -o ${OBJECTDIR}/utils.o utils.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/utils.o.d" -o ${OBJECTDIR}/utils.o utils.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
 else
-${OBJECTDIR}/audio.o: audio.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/audio.o: audio.c  .generated_files/flags/default/7d31520398003f969756021d20ba90e9e428873c .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/audio.o.d 
 	@${RM} ${OBJECTDIR}/audio.o 
-	@${FIXDEPS} "${OBJECTDIR}/audio.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/audio.o.d" -o ${OBJECTDIR}/audio.o audio.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/audio.o.d" -o ${OBJECTDIR}/audio.o audio.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/74e681807863d7f4d4f30ea5351b9e05843f54e6 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
 	@${RM} ${OBJECTDIR}/main.o 
-	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/mic.o: mic.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/mic.o: mic.c  .generated_files/flags/default/fffb0a9010e6d59735ceb878df0ba16b64e4a625 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/mic.o.d 
 	@${RM} ${OBJECTDIR}/mic.o 
-	@${FIXDEPS} "${OBJECTDIR}/mic.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/mic.o.d" -o ${OBJECTDIR}/mic.o mic.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/mic.o.d" -o ${OBJECTDIR}/mic.o mic.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/adc.o: adc.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/adc.o: adc.c  .generated_files/flags/default/3935c066b7ff1ade2f19c7bb1b292313ea7cf32d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/adc.o.d 
 	@${RM} ${OBJECTDIR}/adc.o 
-	@${FIXDEPS} "${OBJECTDIR}/adc.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/adc.o.d" -o ${OBJECTDIR}/adc.o adc.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/adc.o.d" -o ${OBJECTDIR}/adc.o adc.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/led.o: led.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/led.o: led.c  .generated_files/flags/default/6f83895479754db945274d64af961a957726f7e1 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/led.o.d 
 	@${RM} ${OBJECTDIR}/led.o 
-	@${FIXDEPS} "${OBJECTDIR}/led.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/led.o.d" -o ${OBJECTDIR}/led.o led.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/led.o.d" -o ${OBJECTDIR}/led.o led.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/swt.o: swt.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/swt.o: swt.c  .generated_files/flags/default/243632af8cde79030e68cf03dfc7884049ae6f20 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/swt.o.d 
 	@${RM} ${OBJECTDIR}/swt.o 
-	@${FIXDEPS} "${OBJECTDIR}/swt.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/swt.o.d" -o ${OBJECTDIR}/swt.o swt.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/swt.o.d" -o ${OBJECTDIR}/swt.o swt.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/lcd.o: lcd.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/lcd.o: lcd.c  .generated_files/flags/default/952f6165b25205c62e8a999a8289de970f75317e .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/lcd.o.d 
 	@${RM} ${OBJECTDIR}/lcd.o 
-	@${FIXDEPS} "${OBJECTDIR}/lcd.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/lcd.o.d" -o ${OBJECTDIR}/lcd.o lcd.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/lcd.o.d" -o ${OBJECTDIR}/lcd.o lcd.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
-${OBJECTDIR}/utils.o: utils.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/utils.o: utils.c  .generated_files/flags/default/111332b06c6b235f49dafeaec5c12f93904055dc .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/utils.o.d 
 	@${RM} ${OBJECTDIR}/utils.o 
-	@${FIXDEPS} "${OBJECTDIR}/utils.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/utils.o.d" -o ${OBJECTDIR}/utils.o utils.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD) 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/utils.o.d" -o ${OBJECTDIR}/utils.o utils.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)    
 	
 endif
 
@@ -208,15 +209,15 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: link
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-dist/${CND_CONF}/${IMAGE_TYPE}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
-	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -mdebugger -D__MPLAB_DEBUGGER_PK3=1 -mprocessor=$(MP_PROCESSOR_OPTION)  -o dist/${CND_CONF}/${IMAGE_TYPE}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)   -mreserve=data@0x0:0x1FC -mreserve=boot@0x1FC02000:0x1FC02FEF -mreserve=boot@0x1FC02000:0x1FC0275F  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"
+${DISTDIR}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
+	@${MKDIR} ${DISTDIR} 
+	${MP_CC} $(MP_EXTRA_LD_PRE) -g -mdebugger -D__MPLAB_DEBUGGER_PK3=1 -mprocessor=$(MP_PROCESSOR_OPTION)  -o ${DISTDIR}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)   -mreserve=data@0x0:0x1FC -mreserve=boot@0x1FC02000:0x1FC02FEF -mreserve=boot@0x1FC02000:0x1FC0275F  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,-D=__DEBUG_D,--defsym=__MPLAB_DEBUGGER_PK3=1,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map" 
 	
 else
-dist/${CND_CONF}/${IMAGE_TYPE}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
-	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION)  -o dist/${CND_CONF}/${IMAGE_TYPE}/AUDIODemo.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"
-	${MP_CC_DIR}\\xc32-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/AUDIODemo.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} 
+${DISTDIR}/AUDIODemo.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
+	@${MKDIR} ${DISTDIR} 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION)  -o ${DISTDIR}/AUDIODemo.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map" 
+	${MP_CC_DIR}\\xc32-bin2hex ${DISTDIR}/AUDIODemo.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} 
 endif
 
 
@@ -229,8 +230,8 @@ endif
 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
-	${RM} -r build/default
-	${RM} -r dist/default
+	${RM} -r ${OBJECTDIR}
+	${RM} -r ${DISTDIR}
 
 # Enable dependency checking
 .dep.inc: .depcheck-impl
