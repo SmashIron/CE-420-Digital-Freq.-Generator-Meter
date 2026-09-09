@@ -61,9 +61,9 @@ void __ISR(_TIMER_2_VECTOR, ipl2) Timer2_ISR(void)
 {
     char strMsg[80];
     IFS0bits.T2IF = 0;    // Reset Interrupt Flag Status bit.
-    sprintf(strMsg, "O Hz:%04d", x);
+    sprintf(strMsg, "O Hz:%04d", TMR4);
     LCD_WriteStringAtPos(strMsg, 0, 0);
-    sprintf(strMsg, "I Hz:%04d", x+1);
+    sprintf(strMsg, "I Hz:%04d", TMR4+1);
     LCD_WriteStringAtPos(strMsg, 1, 0);
 }
 
@@ -127,8 +127,8 @@ main()
     OC4CONbits.OC32 = 0;    //Select Timer 3
     OC4CONbits.OCTSEL = 1;  //Select Timer 3
     
-    OC4R = 0;               //Set primary compare register
-    OC4RS = 1;              //Set secondary compare register
+    OC4R = 0;          //Set primary compare register
+    OC4RS = 0x9FFF;         //Set secondary compare register
     PR3 = 0xFFFF;           //Set period register of Timer 3
     
     IEC0bits.OC4IE = 0;     //Disable interrupt on OC4
@@ -161,8 +161,7 @@ main()
     x = 0;    // Represents current column that is pulled low
     
     //Program
-    while (1)
-    {
+    
     // Task 1: Scan keypad inputs to update timer and state accordingly
     int col = 0;    // Represents current column that is pulled low
     int row = 0;    // Represents found row that is pulled low (key press)
@@ -225,11 +224,10 @@ main()
             //Find corresponding key from column and row
             key = keyMap[row][col];
             
-            //State logic to determine how to update buffer and change state
-            switch (key) {
-                
-            }
-            }   //End of switch
+//            //State logic to determine how to update buffer and change state
+//            switch (key) {
+//                
+//            }   //End of switch
         }   //End of key found
         
         //Go to next column and loop around if necessary
