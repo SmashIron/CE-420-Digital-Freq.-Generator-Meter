@@ -35,166 +35,96 @@
 #define Row2 PORTGbits.RG7
 #define Row3 PORTCbits.RC3
 
-//Kitchen timer states typedef
-//typedef enum {
-//    START,
-//    RUNNING,
-//    PAUSE,
-//    END
-//} KitchenState;
+//Display states typedef
+typedef enum {
+    state_DISPLAY,
+    state_EDIT
+} displayState;
 
 // Variables
 char x;
 int currentOutFreq = 0; //In Hz
 int currentInFreq = 0;  //In Hz
+int potentialOutFreq = 0;
+
 char lcdLine1[16], lcdLine2[16];    //Each line can have up to 16 characters
+displayState state = state_DISPLAY;
 
 // Functions
 void initMain(void);
+void configTimers(void);
+void findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS);
 void msDelay(int ms);
 
 //Timers (Multi-Vector Interrupt)
 
-// Task 2: Refresh 7-segment Displays to display 4 byte buffer
+// Task 2: Refresh LCDs
 // 50-Hz timer with lowest priority
-void __ISR(_TIMER_2_VECTOR, ipl2) Timer2_ISR(void)
+void __ISR(_TIMER_1_VECTOR, ipl2) Timer1_ISR(void)
 {
     char strMsg[80];
-    IFS0bits.T2IF = 0;    // Reset Interrupt Flag Status bit.
-    sprintf(strMsg, "O Hz:%04d", TMR4);
+    IFS0bits.T1IF = 0;    // Reset Interrupt Flag Status bit.
+    
+    //Print top line
+    if (state == state_DISPLAY) {
+        sprintf(strMsg, "O Hz:%10d", currentOutFreq);
+    }
+    else {  //In edit State
+        sprintf(strMsg, "O Hz:%10d", potentialOutFreq);
+    }
     LCD_WriteStringAtPos(strMsg, 0, 0);
-    sprintf(strMsg, "I Hz:%04d", TMR4+1);
+    
+    //Print bottom line
+    sprintf(strMsg, "I Hz:%10d", currentInFreq);
     LCD_WriteStringAtPos(strMsg, 1, 0);
 }
 
-// Task 3: Decrement timer buffer according to minutes/seconds
+// Task 3: Calculate input frequency
 // 1-Hz timer with highest priority
-void __ISR(_TIMER_3_VECTOR, ipl3) Timer3_ISR(void)
+void __ISR(_TIMER_2_VECTOR, ipl3) Timer2_ISR(void)
 {
-    IFS0bits.T3IF = 0;    // Reset Interrupt Flag Status bit.
+    currentInFreq = TMR4;   //Obtain external clock counter
+    TMR4 = 0;               //Reset counter
+    IFS0bits.T2IF = 0;      // Reset Interrupt Flag Status bit. 
 }
 
 main()
 {
 //Configuration
     initMain(); //Initialize the clock and GPIO
-    
-    //Configure Timer 2 for 20 ms periodic interrupt
-    //(49,999+1)*32/80,000,000 = 0.02 seconds
-    T2CON = 0;          //Turn Timer2 OFF
-    TMR2 = 0;           //Clear the count of Timer2
-    PR2 = 0xC34F;       //Period register set to 49,999
-    T2CON = 0x0050;     //Set pre-scaler to 32 -> (101)b
-    
-    IPC2bits.T2IP = 2;  //Set Timer2 priority level to 2
-    IEC0bits.T2IE = 1;  //Enable Timer2 interrupt
-    
-    //Configure Timer 3 for 0.2 second periodic interrupt
-    //(62499+1)*256/80,000,000 = 0.2 seconds
-    T3CON = 0;          //Turn Timer3 OFF
-    TMR3 = 0;           //Clear the count of Timer3
-    PR3 = 0xF423;       //Period register set to 62,499
-    T3CON = 0x0070;     //Set pre-scaler to largest value 256 -> (111)b
-    
-    IPC3bits.T3IP = 3;  //Set Timer3 priority level to 3
-    IEC0bits.T3IE = 1;  //Enable Timer3 interrupt
-    
-    //Configure Timer 45 for external clock source
-    T4CON = 0;          //Turn Timer4 OFF and set pre-scaler to smallest value 1 -> (000)b
-    T5CON = 0;          //Turn Timer5 OFF
-    T4CONbits.T32 = 1;  //Enable 32-bit mode
-    T4CONbits.TCS = 1;  //Turn on external clock source
-    PR4 = 0xFFFFFFFF;   //Largest possible period register
-    TMR4 = 0;           //Clear the count of Timer45
-    IEC0bits.T5IE = 0;  //Disable interrupt on Timer45
-    IFS0bits.T5IF = 0;  //Clear any pending Timer 45 interrupt flag
-    
-    //Connect external clock source pin
-    TRISDbits.TRISD9 = 1;       //RD9 as input
-    T4CKRbits.T4CKR = 0b0000;   //Select RPD9 for T4CK according to datasheet
-    
-    T4CONbits.ON = 1;   //Turn Timer45 ON
-    
-    
-    
-    
-    
-    //Setup OC4 with Timer 3 as double compare pulse train
-    T3CON = 0;              //Disable Timer 3 and set pre-scaler
-    
-    OC4CON = 0;             //Turn off OC4
-    OC4CONbits.OCM = 0b101; //Dual compare pulse train mode
-    OC4CONbits.OC32 = 0;    //Select Timer 3
-    OC4CONbits.OCTSEL = 1;  //Select Timer 3
-    
-    OC4R = 0;          //Set primary compare register
-    OC4RS = 0x9FFF;         //Set secondary compare register
-    PR3 = 0xFFFF;           //Set period register of Timer 3
-    
-    IEC0bits.OC4IE = 0;     //Disable interrupt on OC4
-    IFS0bits.OC4IF = 0;     //Clear interrupt flag
-    
-    TRISDbits.TRISD11 = 0;      //RD11 as output
-    RPD11Rbits.RPD11R = 0b1011; //RD11 selected to OC4 according to datasheet
-    
-    T3CONbits.ON = 1;       //Enable Timer 3
-    OC4CONbits.ON = 1;      //Enable OC4
-    
-    
-    
-    
+    configTimers();
+    LCD_Init();
 
-    
 // Multi-vector
     INTEnableSystemMultiVectoredInt();
-    T2CONSET = 0x8000;  //Turn Timer 2 ON (will always be ON)
-    T3CONSET = 0x8000;  //Turn Timer 3 ON (will always be ON)
+    
+    //Turn on all timers
+    T1CONSET = 0x8000;  //Always ON
+    T2CONSET = 0x8000;  //Always ON
+    T4CONSET = 0x8000;  //Always ON
 
 
-
-    LCD_Init();
-    //LCD_WriteStringAtPos("Output Freq: 100", 0, 0);
-    //LCD_WriteStringAtPos("Input Freq: 150", 1, 0);
-    
-    
-// Task 1: S
-    x = 0;    // Represents current column that is pulled low
-    
-    //Program
-    
-    // Task 1: Scan keypad inputs to update timer and state accordingly
+// Task 1: Scan for user inputs and change state
     int col = 0;    // Represents current column that is pulled low
     int row = 0;    // Represents found row that is pulled low (key press)
     int found = 1;  // Represents a key press being found
     char key = 0;   // Newest key input
     
     //Key map of keypad by row then column
-    char keyMap[4][4] = {{1,2,3,0xA},{4,5,6,0xB},{7,8,9,0xC},{0,0xF,0xE,0xD}};
-    
+    const char keyMap[4][4] = {{1,2,3,0xA},{4,5,6,0xB},{7,8,9,0xC},{0,0xF,0xE,0xD}};
     
     //Obtain user inputs from keypad
     while (1)
     {
         // Pull all columns to be high
-        Col0 = 1;
-        Col1 = 1;
-        Col2 = 1;
-        Col3 = 1;
-        
+        Col0 = 1; Col1 = 1; Col2 = 1; Col3 = 1;
+
         // Actively pull current column low
         switch (col) {
-            case 0:
-                Col0 = 0;
-                break;
-            case 1:
-                Col1 = 0;
-                break;
-            case 2:
-                Col2 = 0;
-                break;
-            default:
-                Col3 = 0;
-                break;
+            case 0: Col0 = 0; break;
+            case 1: Col1 = 0; break;
+            case 2: Col2 = 0; break;
+            default: Col3 = 0; break;
         }
         
         //Wait 1 ms
@@ -211,23 +141,67 @@ main()
         // Stay in "wait loop" until key is released
         if (found == 1) {
             switch (row) {
-                case 0:
-                    while (Row0 == 0) {/*wait until key is released*/}break;
-                case 1:
-                    while (Row1 == 0) {/*wait until key is released*/}break;
-                case 2:
-                    while (Row2 == 0) {/*wait until key is released*/}break;
-                default:
-                    while (Row3 == 0) {/*wait until key is released*/}break;
+                case 0: while (Row0 == 0) {/*wait until key is released*/}break;
+                case 1: while (Row1 == 0) {/*wait until key is released*/}break;
+                case 2: while (Row2 == 0) {/*wait until key is released*/}break;
+                default: while (Row3 == 0) {/*wait until key is released*/}break;
             }
             
             //Find corresponding key from column and row
             key = keyMap[row][col];
             
-//            //State logic to determine how to update buffer and change state
-//            switch (key) {
-//                
-//            }   //End of switch
+            //State logic to determine how to update frequencies and change state
+            if (0 <= key && key <= 9) {   //Decimal character inputted
+                if (state == state_DISPLAY) {
+                    potentialOutFreq = key;
+                    state == state_EDIT;
+                }
+                else {
+                    //Shift current value left and truncate left most digits
+                    potentialOutFreq = (potentialOutFreq*10 + key) % 10000000000;
+                }
+            }
+            else if (key == 0xA) { //New output frequency entered
+                //Check if new frequency is valid
+                if (10 <= potentialOutFreq && potentialOutFreq <= 1000000) {
+                    currentOutFreq = potentialOutFreq;
+                    potentialOutFreq = 0;
+                    int prescaler, prValue, OCXRS;
+                    findOCsettings(potentialOutFreq, &prescaler, &prValue, &OCXRS);
+                    
+                    
+                    //Setup OC4 with Timer 3 as double compare pulse train
+                    T3CON = 0;              //Disable Timer 3 and set pre-scaler
+                    T3CONbits.TCKPS = prescaler;
+                    
+                    OC4CON = 0;             //Turn off OC4
+                    OC4CONbits.OCM = 0b101; //Dual compare pulse train mode
+                    OC4CONbits.OC32 = 0;    //Select Timer 3
+                    OC4CONbits.OCTSEL = 1;  //Select Timer 3
+
+                    OC4R = 0;          //Set primary compare register
+                    OC4RS = OCXRS;     //Set secondary compare register
+                    PR3 = prValue;     //Set period register of Timer 3
+
+                    IEC0bits.OC4IE = 0;     //Disable interrupt on OC4
+                    IFS0bits.OC4IF = 0;     //Clear interrupt flag
+
+                    TRISDbits.TRISD11 = 0;      //RD11 as output
+                    RPD11Rbits.RPD11R = 0b1011; //RD11 selected to OC4 according to datasheet
+
+                    T3CONbits.ON = 1;       //Enable Timer 3
+                    OC4CONbits.ON = 1;      //Enable OC4
+                }
+                state == state_DISPLAY;
+            }
+            else if (key == 0xC) {
+                potentialOutFreq = 0;
+                state == state_DISPLAY;
+            }
+            else if (key == 0xE) {
+                OC4CON = 0; //Turn off OC4
+                return 0;   //Exit safely
+            }
         }   //End of key found
         
         //Go to next column and loop around if necessary
@@ -261,6 +235,68 @@ void initMain(void) {
     TRISGbits.TRISG8 = 1;  // Row 2 configured as output
     TRISGbits.TRISG7 = 1;  // Row 1 configured as output
     TRISCbits.TRISC3 = 1;  // Row 0 configured as output
+}
+
+//Configure Timers ...
+void configTimers(void) {
+//Configure Timer 1 for 20 ms periodic interrupt
+    //(49,999+1)*32/80,000,000 = 0.02 seconds
+    T1CON = 0;          //Turn OFF
+    TMR1 = 0;           //Clear the count
+    PR1 = 49999;        //Period register set to 49,999
+    T1CON = 0x0050;     //Set pre-scaler to 32 -> (101)b
+    IPC1bits.T1IP = 2;  //Set priority level
+    IEC0bits.T2IE = 1;  //Enable interrupt
+    
+//Configure Timer 2 for 1 s periodic interrupt
+    //(62499+1)*256/80,000,000 = 0.2 seconds
+    T2CON = 0;          //Turn OFF
+    TMR2 = 0;           //Clear the count
+    PR2 = 62999;        //Period register set to 62,499
+    T2CON = 0x0070;     //Set pre-scaler to 256 -> (111)b
+    IPC2bits.T2IP = 3;  //Set priority level
+    IEC0bits.T2IE = 1;  //Enable interrupt
+    
+//Configure Timer 3 for OC4, but both start off
+    T3CON = 0;          //Disable Timer 3 and set pre-scaler
+    OC4CON = 0;         //Turn off OC4
+
+//Configure Timer 45 for external clock source
+    T4CON = 0;          //Turn Timer4 OFF and set pre-scaler to smallest value 1 -> (000)b
+    T5CON = 0;          //Turn Timer5 OFF
+    T4CONbits.T32 = 1;  //Enable 32-bit mode
+    T4CONbits.TCS = 1;  //Turn on external clock source
+    PR4 = 0xFFFFFFFF;   //Largest possible period register
+    TMR4 = 0;           //Clear the count of Timer45
+    IEC0bits.T5IE = 0;  //Disable interrupt on Timer45
+    IFS0bits.T5IF = 0;  //Clear any pending Timer 45 interrupt flag
+    
+    //Connect external clock source pin
+    TRISDbits.TRISD9 = 1;       //RD9 as input
+    T4CKRbits.T4CKR = 0b0000;   //Select RPD9 for T4CK according to datasheet
+}
+
+//Find timer prescalar, PR Value
+//PR is OC4RS*2-1
+void findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS) {
+    const int possiblePrescalar[] = {1, 2, 4, 8, 16, 32, 64, 256};
+    int bestN = 0;
+    int bestPrescalar = 0;
+    
+    int i;
+    for (i = 0; i < 8; i++) {
+        int possibleN = 80000000/(desiredFreq*possiblePrescalar[i]);
+        if (possibleN % 2 == 1) {
+            possibleN += 1; //Round to closest odd if not quotient isn't even
+        }
+        if (possibleN > bestN && possibleN < 65536) {
+            bestN = possibleN;
+            bestPrescalar = possiblePrescalar[i];
+        }
+    }
+        *prescaler = bestPrescalar;
+        *prValue = bestN - 1;
+        *OCXRS = (bestN/2);
 }
 
 //Delays for the specified number of milliseconds, ms
