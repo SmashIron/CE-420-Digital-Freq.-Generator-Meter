@@ -85,7 +85,7 @@ void __ISR(_TIMER_1_VECTOR, ipl2) Timer1_ISR(void)
 void __ISR(_TIMER_2_VECTOR, ipl3) Timer2_ISR(void)
 {
     freqDivider++;
-        currentInFreq = 5*TMR4; //Obtain external clock counter
+        currentInFreq = 10*TMR4; //Obtain external clock counter //5*TMR4
         TMR4 = 0;               //Reset counter
         IFS0bits.T2IF = 0;      // Reset Interrupt Flag Status bit.
         freqDivider = 0;
@@ -161,7 +161,11 @@ main()
                 }
                 else {
                     //Shift current value left and truncate left most digits
-                    potentialOutFreq = (potentialOutFreq*10 + key) % 10000000000;
+//                    potentialOutFreq = (potentialOutFreq*10 + key) % 10000000000;
+                    potentialOutFreq = potentialOutFreq * 10 + key;
+                    if (potentialOutFreq > 10000000) {
+                        potentialOutFreq = 10000000; // Cap at 10 MHz
+                    }
                 }
             }
             else if (key == 0xA) { //New output frequency entered
@@ -252,7 +256,7 @@ void configTimers(void) {
     //(62499+1)*256/80,000,000 = 0.2 seconds
     T2CON = 0;          //Turn OFF
     TMR2 = 0;           //Clear the count
-    PR2 = 62999;        //Period register set to 62,499
+    PR2 = 31249;        //Period register set to 62,499  //Change to 31249 for exact 0.2s period
     T2CON = 0x0070;     //Set pre-scaler to 256 -> (111)b
     IPC2bits.T2IP = 3;  //Set priority level
     IEC0bits.T2IE = 1;  //Enable interrupt
@@ -285,7 +289,7 @@ void findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS) {
     
     int i;
     for (i = 0; i < 8; i++) {
-        int possibleN = 80000000/(desiredFreq*possiblePrescalar[i]);
+        int possibleN = 80000000/(desiredFreq*possiblePrescalar[i]); //DID TIMES TWO 2 ***, changed from 80k to 40k
         if (possibleN % 2 == 1) {
             possibleN += 1; //Round to closest odd if not quotient isn't even
         }
