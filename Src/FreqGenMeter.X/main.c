@@ -54,7 +54,7 @@ displayState state = state_DISPLAY;
 // Functions
 void initMain(void);
 void configTimers(void);
-void findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS);
+int findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS);
 void msDelay(int ms);
 
 //Timers (Multi-Vector Interrupt)
@@ -85,7 +85,7 @@ void __ISR(_TIMER_1_VECTOR, ipl2) Timer1_ISR(void)
 void __ISR(_TIMER_2_VECTOR, ipl3) Timer2_ISR(void)
 {
     freqDivider++;
-        currentInFreq = 10*TMR4; //Obtain external clock counter //5*TMR4
+        currentInFreq = 5*TMR4; //Obtain external clock counter //5*TMR4
         TMR4 = 0;               //Reset counter
         IFS0bits.T2IF = 0;      // Reset Interrupt Flag Status bit.
         freqDivider = 0;
@@ -174,11 +174,11 @@ main()
                     currentOutFreq = potentialOutFreq;
                     potentialOutFreq = 0;
                     int prescaler, prValue, OCXRS;
-                    findOCsettings(currentOutFreq, &prescaler, &prValue, &OCXRS);
-                    
+                    currentOutFreq = findOCsettings(currentOutFreq, &prescaler, &prValue, &OCXRS);
                     
                     //Setup OC4 with Timer 3 as double compare pulse train
                     T3CON = 0;              //Disable Timer 3 and set pre-scaler
+                    TMR3 = 0;
                     T3CONbits.TCKPS = prescaler;
                     
                     OC4CON = 0;             //Turn off OC4
@@ -256,7 +256,7 @@ void configTimers(void) {
     //(62499+1)*256/80,000,000 = 0.2 seconds
     T2CON = 0;          //Turn OFF
     TMR2 = 0;           //Clear the count
-    PR2 = 31249;        //Period register set to 62,499  //Change to 31249 for exact 0.2s period
+    PR2 = 62499;        //Period register set to 62,499  //Change to 31249 for exact 0.2s period
     T2CON = 0x0070;     //Set pre-scaler to 256 -> (111)b
     IPC2bits.T2IP = 3;  //Set priority level
     IEC0bits.T2IE = 1;  //Enable interrupt
@@ -282,14 +282,15 @@ void configTimers(void) {
 
 //Find timer prescalar, PR Value
 //PR is OC4RS*2-1
-void findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS) {
+int PBCLK = 80000000;
+int findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS) {
     const int possiblePrescalar[] = {1, 2, 4, 8, 16, 32, 64, 256};
     int bestN = 0;
     int bestPrescalar = 0;
     
     int i;
     for (i = 0; i < 8; i++) {
-        int possibleN = 80000000/(desiredFreq*possiblePrescalar[i]); //DID TIMES TWO 2 ***, changed from 80k to 40k
+        int possibleN = ((2*PBCLK)/desiredFreq + possiblePrescalar[i]) / (2*possiblePrescalar[i]);//80000000/(desiredFreq*possiblePrescalar[i]); //DID TIMES TWO 2 ***, changed from 80k to 40k
         if (possibleN % 2 == 1) {
             possibleN += 1; //Round to closest odd if not quotient isn't even
         }
@@ -298,9 +299,12 @@ void findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS) {
             bestPrescalar = i;
         }
     }
-        *prescaler = bestPrescalar;
-        *prValue = bestN - 1;
-        *OCXRS = (bestN/2);
+    *prescaler = bestPrescalar;
+    *prValue = bestN - 1;
+    *OCXRS = (bestN/2);
+    
+    int divisor = bestN*possiblePrescalar[bestPrescalar];
+    return (PBCLK + divisor/2)/divisor;     // actual output frequency
 }
 
 //Delays for the specified number of milliseconds, ms
