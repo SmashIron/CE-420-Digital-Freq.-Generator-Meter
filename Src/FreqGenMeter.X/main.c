@@ -1,15 +1,14 @@
 // Michael Collins, Joshua Tewolde
-// Date: 9/31/2026
+// Date: 9/23/2026
 // Microcomputer Systems Final Project Summer 2026
 
 // Description: Frequency Generator and Meter
-// Description
+// See final report handout for more details.
 
 //Performs the following tasks:
-    // Task 1: S
-    // Task 2: R
-    // Task 3: D
-
+    // Task 1: Scan for user inputs and change state
+    // Task 2: Refresh LCDs
+    // Task 3: Calculate input frequency
 
 // configuration bit settings, Fcy=80MHz, Fpb=40MHz
 #pragma config POSCMOD=XT, FNOSC=PRIPLL
@@ -23,8 +22,10 @@
 #include <xc.h>
 #include <sys/attribs.h>
 #include "config.h"
-#include "lcd.h"
+#include "lcd.h"        //LCD Library for Basys MX3
 
+//Clock Frequency
+#define PBCLK 80000000
 //Macros for keypad columns and rows
 #define Col3 LATCbits.LATC2
 #define Col2 LATCbits.LATC1
@@ -42,13 +43,12 @@ typedef enum {
 } displayState;
 
 // Variables
-char key;
-volatile int currentOutFreq = 0; //In Hz
-volatile int currentInFreq = 0;  //In Hz
-volatile int potentialOutFreq = 0;
-int freqDivider = 0;
+char key;   //For keypad inputs
+volatile int currentOutFreq = 0;    //In Hz
+volatile int currentInFreq = 0;     //In Hz
+volatile int potentialOutFreq = 0;  //In Hz
 
-char lcdLine1[16], lcdLine2[16];    //Each line can have up to 16 characters
+char lcdLine1[16], lcdLine2[16];    //Each LCD line can have up to 16 characters
 displayState state = state_DISPLAY;
 
 // Functions
@@ -67,10 +67,10 @@ void __ISR(_TIMER_1_VECTOR, ipl2) Timer1_ISR(void)
     IFS0bits.T1IF = 0;    // Reset Interrupt Flag Status bit.
     
     //Print top line
-    if (state == state_DISPLAY) {
+    if (state == state_DISPLAY) {   //In Display State
         sprintf(strMsg, "O Hz:%10d", currentOutFreq);
     }
-    else {  //In edit State
+    else {  //In Edit State
         sprintf(strMsg, "OEHz:%10d", potentialOutFreq);
     }
     LCD_WriteStringAtPos(strMsg, 0, 0);
@@ -84,11 +84,12 @@ void __ISR(_TIMER_1_VECTOR, ipl2) Timer1_ISR(void)
 // 5-Hz timer with highest priority
 void __ISR(_TIMER_2_VECTOR, ipl3) Timer2_ISR(void)
 {
-    freqDivider++;
-        currentInFreq = 5*TMR4; //Obtain external clock counter //5*TMR4
-        TMR4 = 0;               //Reset counter
-        IFS0bits.T2IF = 0;      // Reset Interrupt Flag Status bit.
-        freqDivider = 0;
+    //Obtain external clock counter and calcuate average freq based on observed period
+    //Observed period is 200 milliseconds (Divide by this)
+    currentInFreq = 5*TMR4; 
+    
+    TMR4 = 0;               // Reset counter
+    IFS0bits.T2IF = 0;      // Reset Interrupt Flag Status bit.
 }
 
 main()
@@ -101,7 +102,7 @@ main()
 // Multi-vector
     INTEnableSystemMultiVectoredInt();
     
-    //Turn on all timers
+//Turn on all timers
     T1CONSET = 0x8000;  //Always ON
     T2CONSET = 0x8000;  //Always ON
     T4CONSET = 0x8000;  //Always ON
@@ -111,7 +112,7 @@ main()
     int col = 0;    // Represents current column that is pulled low
     int row = 0;    // Represents found row that is pulled low (key press)
     int found = 1;  // Represents a key press being found
-    key = 0;   // Newest key input
+    key = 0;        // Newest key input
     
     //Key map of keypad by row then column
     const char keyMap[4][4] = {{1,2,3,0xA},{4,5,6,0xB},{7,8,9,0xC},{0,0xF,0xE,0xD}};
@@ -156,12 +157,12 @@ main()
             //State logic to determine how to update frequencies and change state
             if (0 <= key && key <= 9) {   //Decimal character inputted
                 if (state == state_DISPLAY) {
+                    //Start Edit State
                     potentialOutFreq = key;
                     state = state_EDIT;
                 }
                 else {
-                    //Shift current value left and truncate left most digits
-//                    potentialOutFreq = (potentialOutFreq*10 + key) % 10000000000;
+                    //Shift current value left
                     potentialOutFreq = potentialOutFreq * 10 + key;
                     if (potentialOutFreq > 10000000) {
                         potentialOutFreq = 10000000; // Cap at 10 MHz
@@ -171,8 +172,11 @@ main()
             else if (key == 0xA) { //New output frequency entered
                 //Check if new frequency is valid
                 if (10 <= potentialOutFreq && potentialOutFreq <= 10000000) {
+                    //Apply frequency change
                     currentOutFreq = potentialOutFreq;
                     potentialOutFreq = 0;
+                    
+                    //Update OC accordingly based on new currentOutFreq
                     int prescaler, prValue, OCXRS;
                     currentOutFreq = findOCsettings(currentOutFreq, &prescaler, &prValue, &OCXRS);
                     
@@ -199,13 +203,14 @@ main()
                     T3CONbits.ON = 1;       //Enable Timer 3
                     OC4CONbits.ON = 1;      //Enable OC4
                 }
-                state = state_DISPLAY;
+                state = state_DISPLAY;  //Exit Edit state
             }
-            else if (key == 0xC) {
+            else if (key == 0xC) {  //Clear button pressed
+                //Exit the Edit state with no changes applied
                 potentialOutFreq = 0;
                 state = state_DISPLAY;
             }
-            else if (key == 0xE) {
+            else if (key == 0xE) {  //Exit button pressed
                 OC4CON = 0; //Turn off OC4
                 return 0;   //Exit safely
             }
@@ -252,7 +257,7 @@ void configTimers(void) {
     IPC1bits.T1IP = 2;  //Set priority level
     IEC0bits.T1IE = 1;  //Enable interrupt
     
-//Configure Timer 2 for 1 s periodic interrupt
+//Configure Timer 2 for 200 ms periodic interrupt
     //(62499+1)*256/80,000,000 = 0.2 seconds
     T2CON = 0;          //Turn OFF
     TMR2 = 0;           //Clear the count
@@ -262,7 +267,7 @@ void configTimers(void) {
     IEC0bits.T2IE = 1;  //Enable interrupt
     
 //Configure Timer 3 for OC4, but both start off
-    T3CON = 0;          //Disable Timer 3 and set pre-scaler
+    T3CON = 0;          //Disable Timer 3
     OC4CON = 0;         //Turn off OC4
 
 //Configure Timer 45 for external clock source
@@ -280,20 +285,24 @@ void configTimers(void) {
     T4CKRbits.T4CKR = 0b0000;   //Select RPD9 for T4CK according to datasheet
 }
 
-//Find timer prescalar, PR Value
-//PR is OC4RS*2-1
-int PBCLK = 80000000;
+//Find timer prescalar, PR, and OC register values
+//Desired Frequency is the desired output signal frequency in Hz
+//Returns actual possible output frequency
 int findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS) {
     const int possiblePrescalar[] = {1, 2, 4, 8, 16, 32, 64, 256};
     int bestN = 0;
     int bestPrescalar = 0;
     
     int i;
+    //For each possible prescalar
     for (i = 0; i < 8; i++) {
-        int possibleN = ((2*PBCLK)/desiredFreq + possiblePrescalar[i]) / (2*possiblePrescalar[i]);//80000000/(desiredFreq*possiblePrescalar[i]); //DID TIMES TWO 2 ***, changed from 80k to 40k
+        //N is the period of the timer
+        int possibleN = PBCLK/(desiredFreq*possiblePrescalar[i]);
         if (possibleN % 2 == 1) {
-            possibleN += 1; //Round to closest odd if not quotient isn't even
+            possibleN += 1; //Round to closest even if quotient isn't even
         }
+        
+        //Better than previous calculated prescalars?
         if (possibleN > bestN && possibleN < 65536) {
             bestN = possibleN;
             bestPrescalar = i;
@@ -303,8 +312,7 @@ int findOCsettings(int desiredFreq, int *prescaler, int *prValue, int *OCXRS) {
     *prValue = bestN - 1;
     *OCXRS = (bestN/2);
     
-    int divisor = bestN*possiblePrescalar[bestPrescalar];
-    return (PBCLK + divisor/2)/divisor;     // actual output frequency
+    return PBCLK/(bestN*possiblePrescalar[bestPrescalar]); // actual output frequency
 }
 
 //Delays for the specified number of milliseconds, ms
